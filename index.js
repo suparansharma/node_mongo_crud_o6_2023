@@ -62,10 +62,16 @@ async function run() {
 
     app.delete('/category/:id',async(req,res)=>{
       const id = req.params.id;
+      // console.log(id);
       console.log("try to dlt",id);
-      const query ={_id : id}
+      const query ={_id : new ObjectId(id)}
       const result = await categoryCollection.deleteOne(query);
+      console.log(result);
       res.send(result);
+
+      // const data = await categoryCollection();
+      // const result = await data.deleteOne({_id:new mongodb.ObjectId(req.params.id)})
+      // res.send(result);
     })
     
   } finally {
