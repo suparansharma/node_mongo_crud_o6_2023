@@ -1,19 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
-
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000; 
-app.use(express.json());
+
+//middleware
 app.use(cors())
+app.use(express.json());
 
 app.get('/',(req,res)=>{
     res.send('Simple Node Server Running');
 })
 
-app.listen(port,()=>{
-    console.log(`Simple node server running on port ${port}`);
-})
+
 
 
 const users = [
@@ -46,12 +45,27 @@ async function run() {
   try {
     const categoryCollection = client.db('newsadmin').collection('category');
     const category = {name:'Bangla',status:"true"};
-    app.post('/user',async(req,res)=>{
+
+    app.get('/category',async(req,res)=>{
+    const cursor = categoryCollection.find({});
+    const categories = await cursor.toArray();
+    res.send(categories);
+    });
+
+    app.post('/category',async(req,res)=>{
         const category = req.body;
         const result = await categoryCollection.insertOne(category);
         console.log(result);
         category.id = result.insertedId;
         res.send(category)
+    });
+
+    app.delete('/category/:id',async(req,res)=>{
+      const id = req.params.id;
+      console.log("try to dlt",id);
+      const query ={_id : id}
+      const result = await categoryCollection.deleteOne(query);
+      res.send(result);
     })
     
   } finally {
@@ -101,3 +115,8 @@ app.get('/user',(req,res)=>{
 
 
 // newsadmin
+
+
+app.listen(port,()=>{
+  console.log(`Simple node server running on port ${port}`);
+})
